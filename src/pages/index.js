@@ -6,7 +6,7 @@ import { useStaticQuery, graphql } from "gatsby"
 const IndexPage = () => {
   const isotope = React.useRef()
   // store the filter keyword in a state
-  const [filterKey, setFilterKey] = React.useState("fruits")
+  const [filterKey, setFilterKey] = React.useState("*")
 
   React.useEffect(() => {
     isotope.current = new Isotope(".filter-container", {
@@ -53,10 +53,10 @@ const IndexPage = () => {
     </button>
   ))
   const fruitTiles = data.fruits.nodes.map(el => (
-    <div className={`item all ${el.category} ${el.name}`}>{el.name}</div>
+    <div className={`item ${el.category} ${el.name}`}>{el.name}</div>
   ))
   const veggieTiles = data.veggies.nodes.map(el => (
-    <div className={`item all ${el.category} ${el.name}`}>{el.name}</div>
+    <div className={`item ${el.category} ${el.name}`}>{el.name}</div>
   ))
 
   const tiles = [...veggieTiles, ...fruitTiles]
