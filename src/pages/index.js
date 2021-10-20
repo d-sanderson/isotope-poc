@@ -5,9 +5,10 @@ import { useStaticQuery, graphql } from "gatsby"
 
 const IndexPage = () => {
   const isotope = React.useRef()
+  const container = React.useRef()
   // store the filter keyword in a state
   const [filterKey, setFilterKey] = React.useState("*")
-
+  const [input, setInput] = React.useState("")
   React.useEffect(() => {
     isotope.current = new Isotope(".filter-container", {
       itemSelector: ".item",
@@ -24,7 +25,14 @@ const IndexPage = () => {
       : isotope.current.arrange({ filter: `.${filterKey}` })
   }, [filterKey])
 
-  const handleFilterKeyChange = key => () => setFilterKey(key)
+  // handle search
+  React.useEffect(() => {
+    if (input) {
+      isotope.current.arrange({ filter: `.${input}` })
+    }
+  }, [input])
+
+  const handleFilterKeyChange = key => () => { key === "*" ? setInput("") : setFilterKey(key)}
 
   const data = useStaticQuery(graphql`
     query fruitsAndVeggies {
@@ -52,18 +60,27 @@ const IndexPage = () => {
       {el}
     </button>
   ))
-  const fruitTiles = data.fruits.nodes.map(el => (
-    <div className={`item ${el.category} ${el.name}`}>{el.name}</div>
-  ))
-  const veggieTiles = data.veggies.nodes.map(el => (
-    <div className={`item ${el.category} ${el.name}`}>{el.name}</div>
+
+  const allTiles = [...data.fruits.nodes, ...data.veggies.nodes].map(el => (
+    <div
+      className={`item ${el.category} ${el.name} ${
+        input && filterKey === el.category && el.name.includes(input) ? input : ""
+      }`}
+    >
+      {el.name}
+    </div>
   ))
 
-  const tiles = [...veggieTiles, ...fruitTiles]
+  const handleSearch = e => {
+    setInput(e.target.value)
+  }
   return (
     <Layout>
+      <input type="text" className="quicksearch" onKeyUp={handleSearch} />
       {filterBtns}
-      <div className="filter-container">{tiles}</div>
+      <div ref={container} className="filter-container">
+        {allTiles}
+      </div>
     </Layout>
   )
 }
