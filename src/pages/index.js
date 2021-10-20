@@ -30,9 +30,13 @@ const IndexPage = () => {
     if (input) {
       isotope.current.arrange({ filter: `.${input}` })
     }
+    setInput("")
+    setFilterKey("*")
   }, [input])
 
-  const handleFilterKeyChange = key => () => { key === "*" ? setInput("") : setFilterKey(key)}
+  const handleFilterKeyChange = key => () => {
+    key === "*" ? setInput("") : setFilterKey(key)
+  }
 
   const data = useStaticQuery(graphql`
     query fruitsAndVeggies {
@@ -53,7 +57,7 @@ const IndexPage = () => {
     }
   `)
 
-  const filters = ["fruit", "vegetable", "*"]
+  const filters = ["fruit", "vegetable", "all"]
 
   const filterBtns = filters.map(el => (
     <button onClick={handleFilterKeyChange(el)} id={el}>
@@ -63,8 +67,9 @@ const IndexPage = () => {
 
   const allTiles = [...data.fruits.nodes, ...data.veggies.nodes].map(el => (
     <div
-      className={`item ${el.category} ${el.name} ${
-        input && filterKey === el.category && el.name.includes(input) ? input : ""
+      style={{ margin: "0 10px" }}
+      className={`item all ${el.category} ${el.name} ${
+        el.name.includes(input) ? input : ""
       }`}
     >
       {el.name}
@@ -76,7 +81,9 @@ const IndexPage = () => {
   }
   return (
     <Layout>
-      <input type="text" className="quicksearch" onKeyUp={handleSearch} />
+      <div>
+        <input type="text" className="quicksearch" onChange={handleSearch} />
+      </div>
       {filterBtns}
       <div ref={container} className="filter-container">
         {allTiles}
